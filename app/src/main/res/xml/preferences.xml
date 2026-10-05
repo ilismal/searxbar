@@ -16,6 +16,14 @@
 
     <PreferenceCategory app:title="@string/pref_category_browsing" app:iconSpaceReserved="false">
         <ListPreference
+            app:key="suggestions"
+            app:title="@string/pref_suggestions_title"
+            app:defaultValue="duckduckgo"
+            app:entries="@array/suggestions_entries"
+            app:entryValues="@array/suggestions_values"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+        <ListPreference
             app:key="link_mode"
             app:title="@string/pref_link_mode_title"
             app:defaultValue="custom_tab"

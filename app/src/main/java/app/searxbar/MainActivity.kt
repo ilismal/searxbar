@@ -32,9 +32,14 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
+import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import app.searxbar.databinding.ActivityMainBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,6 +54,9 @@ class MainActivity : AppCompatActivity() {
 
     private var instance: String? = null
     private var defaultUserAgent: String = ""
+
+    private val suggestionAdapter by lazy { SuggestionAdapter(this) }
+    private var suggestionJob: Job? = null
 
     /** True mientras se navega por el flujo de login de Cloudflare Access / proveedor de identidad. */
     private var authInProgress = false
@@ -165,9 +173,39 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
+        setupSuggestions()
         binding.configureButton.setOnClickListener { openSettings() }
         binding.pickPublicButton.setOnClickListener {
             startActivity(Intent(this, InstancePickerActivity::class.java))
+        }
+    }
+
+    private fun setupSuggestions() {
+        binding.searchInput.setAdapter(suggestionAdapter)
+        binding.searchInput.setOnItemClickListener { _, _, position, _ ->
+            search(suggestionAdapter.getItem(position))
+        }
+        binding.searchInput.doAfterTextChanged { requestSuggestions(it?.toString().orEmpty()) }
+    }
+
+    private fun requestSuggestions(text: String) {
+        suggestionJob?.cancel()
+        val query = text.trim()
+        val base = instance
+        val source = Prefs.suggestionSource(this)
+        if (!binding.searchInput.hasFocus() || base == null || source == Suggestions.SOURCE_OFF || query.length < 2) {
+            suggestionAdapter.submit(emptyList())
+            return
+        }
+        val userAgent = webView.settings.userAgentString
+        val cookies = CookieManager.getInstance().getCookie(base)
+        suggestionJob = lifecycleScope.launch {
+            delay(250) // espera a que se deje de teclear
+            val results = Suggestions.fetch(base, query, source, userAgent, cookies)
+            val input = binding.searchInput
+            if (!input.hasFocus() || input.text.toString().trim() != query) return@launch
+            suggestionAdapter.submit(results)
+            if (results.isNotEmpty()) input.showDropDown() else input.dismissDropDown()
         }
     }
 
@@ -237,8 +275,10 @@ class MainActivity : AppCompatActivity() {
             openSettings()
             return
         }
-        binding.searchInput.setText(q)
+        suggestionJob?.cancel()
+        binding.searchInput.dismissDropDown()
         hideKeyboard()
+        binding.searchInput.setText(q, false)
         load(Prefs.searchUrl(base, q))
     }
 
@@ -431,7 +471,7 @@ class MainActivity : AppCompatActivity() {
     private fun syncQueryFromUrl(url: String?) {
         val uri = url?.toUri() ?: return
         if (!isInstance(uri) || binding.searchInput.hasFocus()) return
-        uri.getQueryParameter("q")?.let { binding.searchInput.setText(it) }
+        uri.getQueryParameter("q")?.let { binding.searchInput.setText(it, false) }
     }
 
     private inner class Client : WebViewClient() {

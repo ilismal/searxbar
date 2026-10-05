@@ -11,6 +11,7 @@ object Prefs {
     const val KEY_HIDE_WEBVIEW_UA = "hide_webview_ua"
     const val KEY_CLEAR_DATA = "clear_data"
     const val KEY_PICK_PUBLIC = "pick_public_instance"
+    const val KEY_SUGGESTIONS = "suggestions"
 
     enum class LinkMode { CUSTOM_TAB, BROWSER, WEBVIEW }
 
@@ -30,6 +31,9 @@ object Prefs {
             "webview" -> LinkMode.WEBVIEW
             else -> LinkMode.CUSTOM_TAB
         }
+
+    fun suggestionSource(context: Context): String =
+        prefs(context).getString(KEY_SUGGESTIONS, null) ?: "duckduckgo"
 
     fun hideWebViewUa(context: Context): Boolean =
         prefs(context).getBoolean(KEY_HIDE_WEBVIEW_UA, true)

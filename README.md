@@ -22,6 +22,8 @@ con diseño Material 3, widget para la pantalla de inicio y soporte para instanc
 - **Widget** de barra de búsqueda (4×1, redimensionable) con colores Material You.
 - **Material 3** con colores dinámicos (Android 12+) y modo oscuro.
 - Los resultados se abren en una pestaña integrada (Custom Tab), en el navegador o dentro de la app.
+- **Sugerencias mientras escribes**, a través de la propia instancia (DuckDuckGo por defecto; también Google, Qwant
+  o el proveedor configurado en la instancia). Funcionan también con Cloudflare Access.
 - **Mantén pulsado un enlace** para abrirlo en el navegador predeterminado, copiarlo o compartirlo.
 - Integración con el sistema: *Compartir → SearxBar*, *Buscar con SearxBar* al seleccionar texto y búsquedas web (`WEB_SEARCH`).
 
@@ -88,6 +90,8 @@ app/src/main/java/app/searxbar/
 ├── CloudflareAccess.kt       # Detección de URLs de Access, logout y borrado de sesión
 ├── SettingsActivity.kt       # Ajustes (instancia, enlaces, compatibilidad, borrar datos)
 ├── InstancePickerActivity.kt # Selector de instancias públicas
+├── Suggestions.kt            # Sugerencias vía /autocompleter de la instancia
+├── SuggestionAdapter.kt      # Desplegable de sugerencias
 ├── SearxSpace.kt             # Descarga y filtrado del listado de searx.space
 ├── SearchWidgetProvider.kt   # Widget de pantalla de inicio
 ├── Prefs.kt                  # Preferencias y normalización de URLs

@@ -44,6 +44,7 @@
 
     <string name="pref_category_browsing">Navegación</string>
     <string name="pref_link_mode_title">Abrir resultados en</string>
+    <string name="pref_suggestions_title">Sugerencias de búsqueda</string>
 
     <string name="pref_category_access">Cloudflare Access</string>
     <string name="pref_hide_ua_title">Compatibilidad con proveedores de identidad</string>
@@ -66,6 +67,21 @@
 
     <string name="widget_label">Barra de búsqueda</string>
     <string name="widget_description">Busca en tu instancia de SearXNG desde la pantalla de inicio</string>
+
+    <string-array name="suggestions_entries">
+        <item>Desactivadas</item>
+        <item>Según las preferencias de la instancia</item>
+        <item>DuckDuckGo</item>
+        <item>Google</item>
+        <item>Qwant</item>
+    </string-array>
+    <string-array name="suggestions_values" translatable="false">
+        <item>off</item>
+        <item>instance</item>
+        <item>duckduckgo</item>
+        <item>google</item>
+        <item>qwant</item>
+    </string-array>
 
     <string-array name="link_mode_entries">
         <item>Pestaña integrada (Custom Tab)</item>
