@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SearxBar</string>
+
+    <string name="search_hint">Buscar con SearXNG</string>
+    <string name="search_in">Buscar en %1$s</string>
+
+    <string name="empty_title">Busca en SearXNG</string>
+    <string name="empty_message">Instancia: %1$s</string>
+    <string name="empty_title_unconfigured">Configura tu instancia</string>
+    <string name="empty_message_unconfigured">Introduce la URL de tu instancia de SearXNG en los ajustes para empezar a buscar.</string>
+
+    <string name="action_configure">Introducir URL</string>
+    <string name="action_pick_public">Elegir de searx.space</string>
+    <string name="action_home">Página de la instancia</string>
+    <string name="action_refresh">Recargar</string>
+    <string name="action_share">Compartir enlace</string>
+    <string name="action_open_browser">Abrir en el navegador</string>
+    <string name="action_logout">Cerrar sesión de Cloudflare Access</string>
+    <string name="action_login">Iniciar sesión</string>
+    <string name="action_back">Atrás</string>
+    <string name="action_clear">Borrar</string>
+    <string name="action_search_with">Buscar con SearxBar</string>
+
+    <string name="access_denied">Acceso denegado por el servidor. Puede que tu sesión de Cloudflare Access haya caducado.</string>
+    <string name="error_loading">No se pudo cargar la página: %1$s</string>
+    <string name="error_no_app">No hay ninguna aplicación para abrir este enlace</string>
+
+    <string name="settings_title">Ajustes</string>
+    <string name="pref_category_instance">Instancia</string>
+    <string name="pref_instance_title">URL de la instancia de SearXNG</string>
+    <string name="pref_instance_dialog">Por ejemplo: https://search.ejemplo.com</string>
+    <string name="pref_instance_hint">https://search.ejemplo.com</string>
+    <string name="pref_instance_not_set">Sin configurar</string>
+    <string name="pref_instance_invalid">URL no válida. Usa una dirección http:// o https://</string>
+
+    <string name="pref_pick_public_title">Elegir una instancia pública</string>
+    <string name="pref_pick_public_summary">Del listado de searx.space</string>
+
+    <string name="pref_category_browsing">Navegación</string>
+    <string name="pref_link_mode_title">Abrir resultados en</string>
+
+    <string name="pref_category_access">Cloudflare Access</string>
+    <string name="pref_hide_ua_title">Compatibilidad con proveedores de identidad</string>
+    <string name="pref_hide_ua_summary">Oculta que la app es un WebView. Necesario para iniciar sesión con Google y otros proveedores que bloquean WebViews.</string>
+    <string name="pref_clear_data_title">Borrar cookies y datos</string>
+    <string name="pref_clear_data_summary">Cierra la sesión de Cloudflare Access y borra las preferencias guardadas por la instancia</string>
+    <string name="pref_clear_data_confirm">Se borrarán todas las cookies, la caché y el almacenamiento web. Tendrás que volver a iniciar sesión.</string>
+    <string name="pref_clear_data_done">Datos borrados</string>
+
+    <string name="picker_title">Instancias públicas</string>
+    <string name="picker_filter_hint">Filtrar por nombre</string>
+    <string name="picker_note">Datos de searx.space, ordenadas por velocidad de búsqueda. Las instancias públicas las mantienen voluntarios y pueden limitar las búsquedas.</string>
+    <string name="picker_error">No se pudo descargar el listado: %1$s</string>
+    <string name="picker_retry">Reintentar</string>
+    <string name="picker_search_time">%1$s s</string>
+    <string name="picker_uptime">%1$s %% disponible</string>
+    <string name="picker_tls">TLS %1$s</string>
+    <string name="picker_no_data">Sin datos de rendimiento</string>
+    <string name="picker_current">Instancia actual</string>
+
+    <string name="widget_label">Barra de búsqueda</string>
+    <string name="widget_description">Busca en tu instancia de SearXNG desde la pantalla de inicio</string>
+
+    <string-array name="link_mode_entries">
+        <item>Pestaña integrada (Custom Tab)</item>
+        <item>Navegador predeterminado</item>
+        <item>Dentro de la aplicación</item>
+    </string-array>
+    <string-array name="link_mode_values" translatable="false">
+        <item>custom_tab</item>
+        <item>browser</item>
+        <item>webview</item>
+    </string-array>
+</resources>
