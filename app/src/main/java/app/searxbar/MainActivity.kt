@@ -3,10 +3,16 @@ package app.searxbar
 import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.inputmethod.EditorInfo
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
@@ -20,12 +26,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
+import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import app.searxbar.databinding.ActivityMainBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
@@ -141,7 +149,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.action_home -> { instance?.let(::load); true }
                 R.id.action_refresh -> { webView.reload(); true }
-                R.id.action_share -> { shareCurrentUrl(); true }
+                R.id.action_share -> { webView.url?.let(::shareUrl); true }
                 R.id.action_open_browser -> { webView.url?.toUri()?.let(::openInBrowser); true }
                 R.id.action_logout -> { instance?.let { load(CloudflareAccess.logoutUrl(it)) }; true }
                 R.id.action_settings -> { openSettings(); true }
@@ -262,12 +270,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Abre la URL en el navegador predeterminado, aunque haya otra app
+     * registrada para ese dominio (YouTube, Reddit...).
+     */
     private fun openInBrowser(uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE)
+        defaultBrowserPackage()?.let { intent.setPackage(it) }
         try {
-            startActivity(Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE))
+            startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            showMessage(getString(R.string.error_no_app))
+            try {
+                startActivity(intent.setPackage(null))
+            } catch (e: ActivityNotFoundException) {
+                showMessage(getString(R.string.error_no_app))
+            }
         }
+    }
+
+    /** Paquete del navegador predeterminado, o null si no hay uno elegido. */
+    private fun defaultBrowserPackage(): String? {
+        val probe = Intent(Intent.ACTION_VIEW, "https://example.com".toUri()).addCategory(Intent.CATEGORY_BROWSABLE)
+        val info = packageManager.resolveActivity(probe, PackageManager.MATCH_DEFAULT_ONLY) ?: return null
+        // "android" es el selector del sistema: no hay navegador predeterminado
+        return info.activityInfo?.packageName?.takeUnless { it == "android" }
     }
 
     /** Esquemas no web (intent:, mailto:, tel:, market:...). */
@@ -293,13 +319,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun shareCurrentUrl() {
-        val url = webView.url ?: return
+    private fun shareUrl(url: String) {
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, url)
         }
         startActivity(Intent.createChooser(send, null))
+    }
+
+    private fun copyUrl(url: String) {
+        getSystemService<ClipboardManager>()?.setPrimaryClip(ClipData.newRawUri(null, url.toUri()))
+        // Desde Android 13 el sistema ya muestra su propio aviso al copiar
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) showMessage(getString(R.string.link_copied))
     }
 
     /** Muestra un aviso con opción de volver a iniciar sesión en Cloudflare Access. */
@@ -336,6 +367,12 @@ class MainActivity : AppCompatActivity() {
             // Algunos proveedores de identidad necesitan cookies de terceros durante el login
             setAcceptThirdPartyCookies(webView, true)
         }
+        // Mantener pulsado un enlace muestra sus opciones; sin enlace sigue la selección de texto normal
+        webView.setOnLongClickListener {
+            val url = linkUnderFinger()
+            if (url != null) showLinkMenu(url)
+            url != null
+        }
         webView.webViewClient = Client()
         webView.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView, newProgress: Int) {
@@ -355,6 +392,40 @@ class MainActivity : AppCompatActivity() {
         } else {
             defaultUserAgent
         }
+    }
+
+    private fun showLinkMenu(url: String) {
+        val options = arrayOf(
+            getString(R.string.ctx_open_browser),
+            getString(R.string.ctx_copy_link),
+            getString(R.string.ctx_share_link),
+        )
+        MaterialAlertDialogBuilder(this)
+            .setTitle(url)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> openInBrowser(url.toUri())
+                    1 -> copyUrl(url)
+                    2 -> shareUrl(url)
+                }
+            }
+            .show()
+    }
+
+    /** URL http(s) del enlace bajo el dedo, o null si no se ha pulsado un enlace. */
+    private fun linkUnderFinger(): String? {
+        val hit = webView.hitTestResult
+        val url = when (hit.type) {
+            WebView.HitTestResult.SRC_ANCHOR_TYPE -> hit.extra
+            // En una imagen enlazada, extra es la imagen; el href se pide aparte
+            WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
+                val msg = Handler(Looper.getMainLooper()).obtainMessage()
+                webView.requestFocusNodeHref(msg)
+                msg.data.getString("url")?.takeIf { it.isNotBlank() } ?: hit.extra
+            }
+            else -> null
+        }
+        return url?.takeIf { it.toUri().scheme?.lowercase() in setOf("http", "https") }
     }
 
     private fun syncQueryFromUrl(url: String?) {

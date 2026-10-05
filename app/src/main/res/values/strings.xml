@@ -22,6 +22,11 @@
     <string name="action_clear">Borrar</string>
     <string name="action_search_with">Buscar con SearxBar</string>
 
+    <string name="ctx_open_browser">Abrir en el navegador predeterminado</string>
+    <string name="ctx_copy_link">Copiar enlace</string>
+    <string name="ctx_share_link">Compartir enlace</string>
+    <string name="link_copied">Enlace copiado</string>
+
     <string name="access_denied">Acceso denegado por el servidor. Puede que tu sesión de Cloudflare Access haya caducado.</string>
     <string name="error_loading">No se pudo cargar la página: %1$s</string>
     <string name="error_no_app">No hay ninguna aplicación para abrir este enlace</string>
