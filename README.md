@@ -27,8 +27,11 @@ con diseño Material 3, widget para la pantalla de inicio y soporte para instanc
 
 ## Instalación
 
-Descarga el APK desde la [última release](../../releases/latest) e instálalo (tendrás que permitir la instalación
-de orígenes desconocidos). Requiere **Android 8.0** o superior.
+[<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="60">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/ilismal/searxbar)
+
+Con [Obtainium](https://github.com/ImranR98/Obtainium) recibirás las actualizaciones directamente desde las
+releases de GitHub. También puedes descargar el APK desde la [última release](../../releases/latest) e instalarlo
+a mano (tendrás que permitir la instalación de orígenes desconocidos). Requiere **Android 8.0** o superior.
 
 ## Uso
 
