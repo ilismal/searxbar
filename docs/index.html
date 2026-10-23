@@ -10,156 +10,374 @@
   <meta property="og:description" content="App y widget de Android para buscar en tu instancia de SearXNG.">
   <meta property="og:image" content="https://ilismal.github.io/searxbar/screenshots/home.png">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f7f8fc;
+      --bg: #f6f7fc;
       --surface: #ffffff;
-      --text: #1a1c23;
-      --muted: #5a5f6e;
-      --border: #e2e5ef;
+      --text: #161827;
+      --muted: #5b6075;
+      --border: #e3e6f2;
       --accent: #3050ff;
       --accent-strong: #2236c9;
-      --accent-soft: #e8ecff;
-      --code-bg: #eef0f7;
+      --accent-soft: #e9edff;
+      --code-bg: #eef0f8;
+      --shadow: 0 1px 2px rgba(22, 24, 39, .04), 0 8px 24px rgba(34, 54, 201, .07);
+      --hero-a: #5c7cff;
+      --hero-b: #2236c9;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #111318;
-        --surface: #1b1e26;
-        --text: #e4e6ee;
-        --muted: #9aa0b2;
-        --border: #2c303c;
+        --bg: #0e1016;
+        --surface: #171a24;
+        --text: #e6e8f2;
+        --muted: #9ba1b6;
+        --border: #262a38;
         --accent: #8ea2ff;
-        --accent-strong: #b4c1ff;
-        --accent-soft: #232a4a;
-        --code-bg: #232733;
+        --accent-strong: #b6c2ff;
+        --accent-soft: #1f2645;
+        --code-bg: #1d2130;
+        --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+        --hero-a: #3a55e0;
+        --hero-b: #161f7a;
       }
     }
     * { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      font: 16px/1.65 "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      overflow-x: hidden;
     }
-    a { color: var(--accent); }
+    a { color: var(--accent); text-underline-offset: 3px; }
     a:hover { color: var(--accent-strong); }
-    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
 
-    header.hero {
-      padding: 64px 0 40px;
-      text-align: center;
+    /* ---------- Hero ---------- */
+    .hero {
+      position: relative;
+      color: #fff;
+      background:
+        radial-gradient(900px 500px at 85% 10%, rgba(255, 255, 255, .18), transparent 60%),
+        radial-gradient(700px 500px at 0% 100%, rgba(0, 0, 0, .18), transparent 60%),
+        linear-gradient(135deg, var(--hero-a), var(--hero-b));
+      overflow: hidden;
+      padding: 28px 0 0;
     }
-    .hero img.logo { width: 96px; height: 96px; border-radius: 24px; box-shadow: 0 8px 24px rgba(34, 54, 201, .25); }
-    .hero h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); margin: 20px 0 8px; letter-spacing: -.02em; }
-    .hero p.tagline { font-size: 1.15rem; color: var(--muted); max-width: 620px; margin: 0 auto 28px; }
-    .actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center; }
-    .btn {
+    .hero::after {
+      /* curva inferior */
+      content: ""; position: absolute; left: -10%; right: -10%; bottom: -1px; height: 80px;
+      background: var(--bg); border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    }
+    .hero a { color: #fff; }
+    nav.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    nav.top .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; text-decoration: none; }
+    nav.top .brand img { width: 32px; height: 32px; border-radius: 9px; }
+    nav.top .links { display: flex; gap: 20px; font-weight: 600; font-size: .95rem; }
+    nav.top .links a { text-decoration: none; opacity: .85; }
+    nav.top .links a:hover { opacity: 1; }
+    @media (max-width: 600px) { nav.top .links a:not(.gh) { display: none; } }
+
+    .hero-grid {
+      display: grid; grid-template-columns: 1.05fr .95fr; gap: 32px; align-items: center;
+      padding: 56px 0 0; position: relative; z-index: 1;
+    }
+    .pill {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 12px 22px; border-radius: 999px;
-      font-weight: 600; text-decoration: none;
-      border: 1px solid var(--border); background: var(--surface); color: var(--text);
+      background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .28);
+      padding: 6px 14px; border-radius: 999px; font-size: .85rem; font-weight: 600;
+      backdrop-filter: blur(6px);
     }
-    .btn:hover { border-color: var(--accent); color: var(--text); }
-    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-    .btn.primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
-    @media (prefers-color-scheme: dark) {
-      .btn.primary, .btn.primary:hover { color: #111318; }
+    .pill .dot { width: 8px; height: 8px; border-radius: 50%; background: #7dffb0; box-shadow: 0 0 0 3px rgba(125, 255, 176, .25); }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 3.9rem); line-height: 1.05; margin: 20px 0 18px;
+      letter-spacing: -.035em; font-weight: 800;
     }
-    .actions img.badge { height: 48px; display: block; }
-    .req { margin-top: 14px; font-size: .9rem; color: var(--muted); }
+    .hero h1 span { background: linear-gradient(90deg, #fff, #c9d3ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero p.tagline { font-size: 1.15rem; opacity: .9; max-width: 520px; margin: 0 0 30px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 24px; border-radius: 999px;
+      font-weight: 700; text-decoration: none; font-size: 1rem;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .btn svg { width: 20px; height: 20px; }
+    .btn.light { background: #fff; color: var(--hero-b) !important; box-shadow: 0 10px 30px rgba(10, 20, 90, .3); }
+    .btn.light:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(10, 20, 90, .38); }
+    .btn.ghost { border: 1.5px solid rgba(255, 255, 255, .5); color: #fff; }
+    .btn.ghost:hover { background: rgba(255, 255, 255, .12); }
+    .actions img.badge { height: 54px; display: block; transition: transform .15s ease; }
+    .actions a:hover img.badge { transform: translateY(-2px); }
+    .meta { margin-top: 22px; font-size: .9rem; opacity: .8; display: flex; flex-wrap: wrap; gap: 6px 18px; }
 
+    .phones { position: relative; height: 560px; }
+    .phone {
+      position: absolute; width: 250px; aspect-ratio: 450 / 1000;
+      border-radius: 34px; padding: 9px; background: #0b0d14;
+      box-shadow: 0 30px 60px rgba(5, 10, 60, .45), inset 0 0 0 1.5px #2a2f42;
+    }
+    .phone img { width: 100%; height: 100%; object-fit: cover; border-radius: 26px; display: block; }
+    .phone.back { left: 4%; top: 70px; transform: rotate(-8deg); opacity: .95; }
+    .phone.front { right: 6%; top: 10px; transform: rotate(5deg); }
+
+    @media (max-width: 860px) {
+      .hero-grid { grid-template-columns: 1fr; text-align: center; padding-top: 40px; }
+      .hero p.tagline { margin-left: auto; margin-right: auto; }
+      .actions, .meta { justify-content: center; }
+      .phones { height: 430px; max-width: 380px; width: 100%; margin: 0 auto; }
+      .phone { width: 190px; border-radius: 28px; padding: 7px; }
+      .phone img { border-radius: 22px; }
+      .phone.back { left: 2%; top: 50px; }
+      .phone.front { right: 2%; top: 0; }
+    }
+
+    /* ---------- Secciones ---------- */
+    section { padding: 72px 0; }
+    .eyebrow { color: var(--accent); font-weight: 700; font-size: .85rem; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 8px; }
+    h2 { font-size: clamp(1.7rem, 4vw, 2.3rem); margin: 0 0 14px; letter-spacing: -.025em; line-height: 1.15; font-weight: 800; }
+    .lead { color: var(--muted); font-size: 1.08rem; max-width: 640px; margin: 0 0 36px; }
+    .center { text-align: center; }
+    .center .lead { margin-left: auto; margin-right: auto; }
+
+    .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px;
+      box-shadow: var(--shadow); transition: transform .2s ease, border-color .2s ease;
+    }
+    .card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+    .card .ico {
+      width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
+      background: var(--accent-soft); color: var(--accent); margin-bottom: 16px;
+    }
+    .card .ico svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .card h3 { margin: 0 0 6px; font-size: 1.08rem; font-weight: 700; }
+    .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+
+    /* Galería */
+    .gallery-bg { background: linear-gradient(180deg, transparent, var(--accent-soft) 30%, var(--accent-soft) 70%, transparent); }
     .shots {
-      display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
-      padding: 8px 16px 24px; margin: 0 -16px;
+      display: flex; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory;
+      padding: 12px 16px 28px; margin: 0 -16px; scrollbar-width: thin;
     }
-    .shots figure { margin: 0; flex: 0 0 auto; width: min(190px, 46vw); scroll-snap-align: center; text-align: center; }
-    .shots img {
-      width: 100%; height: auto; aspect-ratio: 450 / 1000; display: block;
-      border-radius: 18px; border: 1px solid var(--border); background: var(--surface);
+    .shots figure { margin: 0; flex: 0 0 auto; width: min(200px, 52vw); scroll-snap-align: center; text-align: center; }
+    .shots .phone { position: static; width: 100%; transform: none; box-shadow: 0 18px 40px rgba(20, 30, 100, .22), inset 0 0 0 1.5px #2a2f42; }
+    .shots figcaption { font-size: .9rem; color: var(--muted); margin-top: 14px; font-weight: 600; }
+    @media (min-width: 1100px) { .shots { justify-content: center; overflow: visible; } }
+
+    /* Cloudflare Access */
+    .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; position: relative; }
+    .flow .step { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; box-shadow: var(--shadow); position: relative; }
+    .flow .step:not(:last-child)::after {
+      content: "→"; position: absolute; right: -16px; top: 50%; transform: translateY(-50%);
+      width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+      background: var(--accent); color: #fff; font-weight: 800; font-size: .9rem; z-index: 1;
     }
-    .shots figcaption { font-size: .85rem; color: var(--muted); margin-top: 8px; }
-    @media (min-width: 1040px) { .shots { justify-content: center; overflow: visible; } }
+    .flow .num { font-size: .8rem; font-weight: 800; color: var(--accent); letter-spacing: .08em; }
+    .flow h3 { margin: 6px 0 6px; font-size: 1.05rem; }
+    .flow p { margin: 0; color: var(--muted); font-size: .95rem; }
+    @media (max-width: 760px) {
+      .flow { grid-template-columns: 1fr; }
+      .flow .step:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -16px; transform: translateX(-50%); }
+    }
 
-    section { padding: 40px 0; }
-    h2 { font-size: 1.6rem; margin: 0 0 20px; letter-spacing: -.01em; }
-    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
-    .card h3 { margin: 0 0 6px; font-size: 1.05rem; }
-    .card p { margin: 0; color: var(--muted); }
+    /* Instalación */
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+    ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 0; }
+    ol.steps li { counter-increment: s; position: relative; padding: 0 0 22px 52px; }
+    ol.steps li::before {
+      content: counter(s); position: absolute; left: 0; top: -2px;
+      width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--hero-a), var(--hero-b)); color: #fff; font-weight: 800;
+    }
+    ol.steps li:last-child { padding-bottom: 0; }
+    code { background: var(--code-bg); padding: 2px 7px; border-radius: 6px; font-size: .88em; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    pre.term {
+      background: #0f1220; color: #d7dcf5; padding: 0; border-radius: 16px; overflow: hidden; margin: 0 0 14px;
+      box-shadow: var(--shadow); border: 1px solid #23283b;
+    }
+    pre.term .bar { display: flex; gap: 7px; padding: 12px 16px; background: #171b2c; }
+    pre.term .bar i { width: 11px; height: 11px; border-radius: 50%; background: #ff5f57; }
+    pre.term .bar i:nth-child(2) { background: #febc2e; }
+    pre.term .bar i:nth-child(3) { background: #28c840; }
+    pre.term code { display: block; background: none; padding: 16px 18px 18px; overflow-x: auto; font-size: .88rem; line-height: 1.7; }
+    pre.term .p { color: #7f8cff; user-select: none; }
+    .note { color: var(--muted); font-size: .92rem; }
 
-    ol.steps { padding-left: 1.3em; margin: 0; }
-    ol.steps li { margin-bottom: 8px; }
-    code { background: var(--code-bg); padding: 2px 6px; border-radius: 6px; font-size: .9em; }
-    pre { background: var(--code-bg); padding: 14px 16px; border-radius: 12px; overflow-x: auto; }
-    pre code { background: none; padding: 0; }
+    /* CTA final */
+    .cta {
+      border-radius: 28px; padding: 48px 24px; text-align: center; color: #fff;
+      background:
+        radial-gradient(600px 300px at 80% 0%, rgba(255, 255, 255, .18), transparent 60%),
+        linear-gradient(135deg, var(--hero-a), var(--hero-b));
+      box-shadow: 0 24px 60px rgba(34, 54, 201, .3);
+    }
+    .cta h2 { color: #fff; }
+    .cta p { opacity: .9; margin: 0 0 26px; }
+    .cta .actions { justify-content: center; }
+    .cta a { color: #fff; }
 
-    footer { border-top: 1px solid var(--border); padding: 24px 0 40px; color: var(--muted); font-size: .9rem; text-align: center; }
+    footer { padding: 40px 0 48px; color: var(--muted); font-size: .9rem; text-align: center; }
+    footer a { color: var(--muted); }
   </style>
 </head>
 <body>
   <header class="hero">
     <div class="wrap">
-      <img class="logo" src="icon.svg" alt="">
-      <h1>SearxBar</h1>
-      <p class="tagline">App y widget de Android para buscar en tu instancia de
-        <a href="https://github.com/searxng/searxng">SearXNG</a>. Material 3, sugerencias mientras escribes
-        y compatible con instancias protegidas por Cloudflare Access.</p>
-      <div class="actions">
-        <a class="btn primary" href="https://github.com/ilismal/searxbar/releases/latest">Descargar APK</a>
-        <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/ilismal/searxbar"><img class="badge" src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium"></a>
-        <a class="btn" href="https://github.com/ilismal/searxbar">Código en GitHub</a>
+      <nav class="top">
+        <a class="brand" href="#"><img src="icon.svg" alt="">SearxBar</a>
+        <div class="links">
+          <a href="#caracteristicas">Características</a>
+          <a href="#capturas">Capturas</a>
+          <a href="#instalacion">Instalación</a>
+          <a class="gh" href="https://github.com/ilismal/searxbar">GitHub ↗</a>
+        </div>
+      </nav>
+
+      <div class="hero-grid">
+        <div>
+          <span class="pill"><span class="dot"></span>Libre · Sin rastreo · Android 8.0+</span>
+          <h1>Tu SearXNG,<br><span>a un toque.</span></h1>
+          <p class="tagline">App y widget de Android para buscar en tu instancia de
+            <a href="https://github.com/searxng/searxng">SearXNG</a>, con Material 3, sugerencias mientras
+            escribes y soporte para instancias protegidas por Cloudflare Access.</p>
+          <div class="actions">
+            <a class="btn light" href="https://github.com/ilismal/searxbar/releases/latest">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+              Descargar APK
+            </a>
+            <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/ilismal/searxbar"><img class="badge" src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium"></a>
+          </div>
+          <div class="meta"><span>Licencia WTFPL</span><span>Código abierto en GitHub</span></div>
+        </div>
+        <div class="phones" aria-hidden="true">
+          <div class="phone back"><img src="screenshots/widget.png" alt=""></div>
+          <div class="phone front"><img src="screenshots/results.png" alt=""></div>
+        </div>
       </div>
-      <p class="req">Requiere Android 8.0 o superior · Licencia WTFPL</p>
     </div>
   </header>
 
-  <div class="wrap">
-    <div class="shots">
-      <figure><img src="screenshots/home.png" alt="Pantalla principal" loading="lazy"><figcaption>Pantalla principal</figcaption></figure>
-      <figure><img src="screenshots/results.png" alt="Resultados de búsqueda" loading="lazy"><figcaption>Resultados</figcaption></figure>
-      <figure><img src="screenshots/instance-picker.png" alt="Selector de instancias públicas" loading="lazy"><figcaption>Instancias públicas</figcaption></figure>
-      <figure><img src="screenshots/settings.png" alt="Ajustes" loading="lazy"><figcaption>Ajustes</figcaption></figure>
-      <figure><img src="screenshots/widget.png" alt="Widget en la pantalla de inicio" loading="lazy"><figcaption>Widget</figcaption></figure>
-    </div>
+  <main>
+    <section id="caracteristicas">
+      <div class="wrap">
+        <p class="eyebrow">Características</p>
+        <h2>Todo lo que necesitas para buscar,<br>nada que no.</h2>
+        <p class="lead">Una barra de búsqueda rápida que respeta tu privacidad y se integra con el sistema.</p>
+        <div class="grid">
+          <div class="card">
+            <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+            <h3>Tu instancia, tus reglas</h3><p>Cualquier instancia de SearXNG, también <code>http://</code> en tu red local.</p>
+          </div>
+          <div class="card">
+            <div class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01"/></svg></div>
+            <h3>Instancias públicas</h3><p>Elige del listado de <a href="https://searx.space">searx.space</a>, ordenadas por velocidad, con disponibilidad, TLS y versión.</p>
+          </div>
+          <div class="card">
+            <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <h3>Cloudflare Access</h3><p>Login con Google, GitHub, Okta o PIN por correo, y de vuelta a tu búsqueda.</p>
+          </div>
+          <div class="card">
+            <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17v4M17 19h4"/></svg></div>
+            <h3>Sugerencias al escribir</h3><p>A través de la propia instancia: DuckDuckGo, Google, Qwant o el que tenga configurado.</p>
+          </div>
+          <div class="card">
+            <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="18" height="7" rx="1.5"/></svg></div>
+            <h3>Widget</h3><p>Barra de búsqueda 4×1 redimensionable con colores Material You.</p>
+          </div>
+          <div class="card">
+            <div class="ico"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+            <h3>Material 3</h3><p>Colores dinámicos en Android 12+ y modo oscuro.</p>
+          </div>
+          <div class="card">
+            <div class="ico"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></div>
+            <h3>Abre como prefieras</h3><p>Pestaña integrada, navegador o dentro de la app. Mantén pulsado un enlace para copiarlo o compartirlo.</p>
+          </div>
+          <div class="card">
+            <div class="ico"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></div>
+            <h3>Integrada en el sistema</h3><p><em>Compartir → SearxBar</em>, <em>Buscar con SearxBar</em> al seleccionar texto y búsquedas web.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <section>
-      <h2>Características</h2>
-      <div class="grid">
-        <div class="card"><h3>Tu instancia, tus reglas</h3><p>Introduce la URL de cualquier instancia de SearXNG, también <code>http://</code> en red local.</p></div>
-        <div class="card"><h3>Instancias públicas</h3><p>Elige una del listado de <a href="https://searx.space">searx.space</a>, ordenadas por velocidad, con disponibilidad, nota TLS y versión.</p></div>
-        <div class="card"><h3>Cloudflare Access</h3><p>Si la instancia está protegida, la app te lleva al login de Access (Google, GitHub, Okta, PIN por correo…) y vuelve a la búsqueda que estabas haciendo.</p></div>
-        <div class="card"><h3>Sugerencias mientras escribes</h3><p>A través de la propia instancia: DuckDuckGo por defecto, también Google, Qwant o el proveedor configurado.</p></div>
-        <div class="card"><h3>Widget</h3><p>Barra de búsqueda 4×1 redimensionable para la pantalla de inicio, con colores Material You.</p></div>
-        <div class="card"><h3>Material 3</h3><p>Colores dinámicos en Android 12+ y modo oscuro.</p></div>
-        <div class="card"><h3>Abre como prefieras</h3><p>Resultados en una pestaña integrada, en el navegador o dentro de la app. Mantén pulsado un enlace para abrirlo, copiarlo o compartirlo.</p></div>
-        <div class="card"><h3>Integrada en el sistema</h3><p><em>Compartir → SearxBar</em>, <em>Buscar con SearxBar</em> al seleccionar texto y búsquedas web del sistema.</p></div>
+    <section id="capturas" class="gallery-bg">
+      <div class="wrap">
+        <div class="center">
+          <p class="eyebrow">Capturas</p>
+          <h2>Limpia, rápida y tuya</h2>
+          <p class="lead">Desde la pantalla de inicio hasta los resultados, sin distracciones.</p>
+        </div>
+        <div class="shots">
+          <figure><div class="phone"><img src="screenshots/home.png" alt="Pantalla principal" loading="lazy"></div><figcaption>Pantalla principal</figcaption></figure>
+          <figure><div class="phone"><img src="screenshots/results.png" alt="Resultados de búsqueda" loading="lazy"></div><figcaption>Resultados</figcaption></figure>
+          <figure><div class="phone"><img src="screenshots/instance-picker.png" alt="Selector de instancias públicas" loading="lazy"></div><figcaption>Instancias públicas</figcaption></figure>
+          <figure><div class="phone"><img src="screenshots/settings.png" alt="Ajustes" loading="lazy"></div><figcaption>Ajustes</figcaption></figure>
+          <figure><div class="phone"><img src="screenshots/widget.png" alt="Widget en la pantalla de inicio" loading="lazy"></div><figcaption>Widget</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="access">
+      <div class="wrap">
+        <p class="eyebrow">Cloudflare Access</p>
+        <h2>¿Tu instancia está detrás de Access?<br>Sin problema.</h2>
+        <p class="lead">SearxBar sigue el flujo de login dentro de la app y te devuelve exactamente donde estabas.</p>
+        <div class="flow">
+          <div class="step"><div class="num">PASO 1</div><h3>Buscas</h3><p>Si no hay sesión o ha caducado, Cloudflare redirige a <code>&lt;equipo&gt;.cloudflareaccess.com</code>.</p></div>
+          <div class="step"><div class="num">PASO 2</div><h3>Inicias sesión</h3><p>Con tu proveedor de identidad, sin salir de la app. Compatible con el login OAuth de Google.</p></div>
+          <div class="step"><div class="num">PASO 3</div><h3>Vuelves a tus resultados</h3><p>Access fija la cookie <code>CF_Authorization</code> y la búsqueda original continúa.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="instalacion">
+      <div class="wrap">
+        <p class="eyebrow">Empezar</p>
+        <h2>Instálala en un minuto</h2>
+        <p class="lead">Recomendamos Obtainium para recibir las actualizaciones directamente desde las releases de GitHub.</p>
+        <div class="two">
+          <ol class="steps">
+            <li>Instálala con <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/ilismal/searxbar">Obtainium</a> o descarga el APK de la <a href="https://github.com/ilismal/searxbar/releases/latest">última release</a> (tendrás que permitir orígenes desconocidos).</li>
+            <li>Abre la app y pulsa <strong>Introducir URL</strong>, o <strong>Elegir de searx.space</strong> para usar una instancia pública.</li>
+            <li>Escribe en la barra y pulsa buscar.</li>
+            <li>Opcional: mantén pulsada la pantalla de inicio → <strong>Widgets</strong> → <strong>SearxBar</strong>.</li>
+          </ol>
+          <div>
+            <pre class="term"><div class="bar"><i></i><i></i><i></i></div><code><span class="p">$ </span>git clone https://github.com/ilismal/searxbar.git
+<span class="p">$ </span>cd searxbar
+<span class="p">$ </span>./gradlew assembleDebug</code></pre>
+            <p class="note">¿Prefieres compilarla tú? Necesitas Android Studio (o JDK 17–22 + Android SDK 35). Los detalles de la release firmada están en el <a href="https://github.com/ilismal/searxbar#readme">README</a>.</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <section>
-      <h2>Instalación</h2>
-      <ol class="steps">
-        <li>Instálala con <a href="https://github.com/ImranR98/Obtainium">Obtainium</a> para recibir las actualizaciones directamente desde GitHub, o descarga el APK de la <a href="https://github.com/ilismal/searxbar/releases/latest">última release</a> (tendrás que permitir orígenes desconocidos).</li>
-        <li>Abre la app y pulsa <strong>Introducir URL</strong>, o <strong>Elegir de searx.space</strong> para usar una instancia pública.</li>
-        <li>Opcional: mantén pulsada la pantalla de inicio → <strong>Widgets</strong> → <strong>SearxBar</strong> para añadir la barra de búsqueda.</li>
-      </ol>
+      <div class="wrap">
+        <div class="cta">
+          <h2>Busca a tu manera.</h2>
+          <p>Gratis, de código abierto y sin rastreo.</p>
+          <div class="actions">
+            <a class="btn light" href="https://github.com/ilismal/searxbar/releases/latest">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+              Descargar APK
+            </a>
+            <a class="btn ghost" href="https://github.com/ilismal/searxbar">Ver en GitHub</a>
+          </div>
+        </div>
+      </div>
     </section>
-
-    <section>
-      <h2>Compilar</h2>
-      <p>Requisitos: Android Studio (o JDK 17–22 + Android SDK 35).</p>
-      <pre><code>git clone https://github.com/ilismal/searxbar.git
-cd searxbar
-./gradlew assembleDebug</code></pre>
-      <p>Más detalles, incluida la release firmada, en el <a href="https://github.com/ilismal/searxbar#readme">README</a>.</p>
-    </section>
-  </div>
+  </main>
 
   <footer>
     <div class="wrap">
-      SearxBar · <a href="https://github.com/ilismal/searxbar">GitHub</a> · <a href="https://github.com/ilismal/searxbar/blob/main/LICENSE">WTFPL</a>
+      SearxBar · <a href="https://github.com/ilismal/searxbar">GitHub</a> · <a href="https://github.com/ilismal/searxbar/blob/main/LICENSE">WTFPL</a> — haz lo que te dé la gana.
     </div>
   </footer>
 </body>
