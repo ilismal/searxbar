@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SearxBar</title>
+  <meta name="description" content="App y widget de Android para buscar en tu instancia de SearXNG. Material 3, compatible con Cloudflare Access y con selector de instancias públicas de searx.space.">
+  <meta name="theme-color" content="#3050FF">
+  <meta property="og:title" content="SearxBar">
+  <meta property="og:description" content="App y widget de Android para buscar en tu instancia de SearXNG.">
+  <meta property="og:image" content="https://ilismal.github.io/searxbar/screenshots/home.png">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --bg: #f7f8fc;
+      --surface: #ffffff;
+      --text: #1a1c23;
+      --muted: #5a5f6e;
+      --border: #e2e5ef;
+      --accent: #3050ff;
+      --accent-strong: #2236c9;
+      --accent-soft: #e8ecff;
+      --code-bg: #eef0f7;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111318;
+        --surface: #1b1e26;
+        --text: #e4e6ee;
+        --muted: #9aa0b2;
+        --border: #2c303c;
+        --accent: #8ea2ff;
+        --accent-strong: #b4c1ff;
+        --accent-soft: #232a4a;
+        --code-bg: #232733;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    }
+    a { color: var(--accent); }
+    a:hover { color: var(--accent-strong); }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+    header.hero {
+      padding: 64px 0 40px;
+      text-align: center;
+    }
+    .hero img.logo { width: 96px; height: 96px; border-radius: 24px; box-shadow: 0 8px 24px rgba(34, 54, 201, .25); }
+    .hero h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); margin: 20px 0 8px; letter-spacing: -.02em; }
+    .hero p.tagline { font-size: 1.15rem; color: var(--muted); max-width: 620px; margin: 0 auto 28px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; border-radius: 999px;
+      font-weight: 600; text-decoration: none;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    }
+    .btn:hover { border-color: var(--accent); color: var(--text); }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
+    @media (prefers-color-scheme: dark) {
+      .btn.primary, .btn.primary:hover { color: #111318; }
+    }
+    .actions img.badge { height: 48px; display: block; }
+    .req { margin-top: 14px; font-size: .9rem; color: var(--muted); }
+
+    .shots {
+      display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
+      padding: 8px 16px 24px; margin: 0 -16px;
+    }
+    .shots figure { margin: 0; flex: 0 0 auto; width: min(190px, 46vw); scroll-snap-align: center; text-align: center; }
+    .shots img {
+      width: 100%; height: auto; aspect-ratio: 450 / 1000; display: block;
+      border-radius: 18px; border: 1px solid var(--border); background: var(--surface);
+    }
+    .shots figcaption { font-size: .85rem; color: var(--muted); margin-top: 8px; }
+    @media (min-width: 1040px) { .shots { justify-content: center; overflow: visible; } }
+
+    section { padding: 40px 0; }
+    h2 { font-size: 1.6rem; margin: 0 0 20px; letter-spacing: -.01em; }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+    .card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+    .card p { margin: 0; color: var(--muted); }
+
+    ol.steps { padding-left: 1.3em; margin: 0; }
+    ol.steps li { margin-bottom: 8px; }
+    code { background: var(--code-bg); padding: 2px 6px; border-radius: 6px; font-size: .9em; }
+    pre { background: var(--code-bg); padding: 14px 16px; border-radius: 12px; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 24px 0 40px; color: var(--muted); font-size: .9rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <img class="logo" src="icon.svg" alt="">
+      <h1>SearxBar</h1>
+      <p class="tagline">App y widget de Android para buscar en tu instancia de
+        <a href="https://github.com/searxng/searxng">SearXNG</a>. Material 3, sugerencias mientras escribes
+        y compatible con instancias protegidas por Cloudflare Access.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/ilismal/searxbar/releases/latest">Descargar APK</a>
+        <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/ilismal/searxbar"><img class="badge" src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium"></a>
+        <a class="btn" href="https://github.com/ilismal/searxbar">Código en GitHub</a>
+      </div>
+      <p class="req">Requiere Android 8.0 o superior · Licencia WTFPL</p>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="shots">
+      <figure><img src="screenshots/home.png" alt="Pantalla principal" loading="lazy"><figcaption>Pantalla principal</figcaption></figure>
+      <figure><img src="screenshots/results.png" alt="Resultados de búsqueda" loading="lazy"><figcaption>Resultados</figcaption></figure>
+      <figure><img src="screenshots/instance-picker.png" alt="Selector de instancias públicas" loading="lazy"><figcaption>Instancias públicas</figcaption></figure>
+      <figure><img src="screenshots/settings.png" alt="Ajustes" loading="lazy"><figcaption>Ajustes</figcaption></figure>
+      <figure><img src="screenshots/widget.png" alt="Widget en la pantalla de inicio" loading="lazy"><figcaption>Widget</figcaption></figure>
+    </div>
+
+    <section>
+      <h2>Características</h2>
+      <div class="grid">
+        <div class="card"><h3>Tu instancia, tus reglas</h3><p>Introduce la URL de cualquier instancia de SearXNG, también <code>http://</code> en red local.</p></div>
+        <div class="card"><h3>Instancias públicas</h3><p>Elige una del listado de <a href="https://searx.space">searx.space</a>, ordenadas por velocidad, con disponibilidad, nota TLS y versión.</p></div>
+        <div class="card"><h3>Cloudflare Access</h3><p>Si la instancia está protegida, la app te lleva al login de Access (Google, GitHub, Okta, PIN por correo…) y vuelve a la búsqueda que estabas haciendo.</p></div>
+        <div class="card"><h3>Sugerencias mientras escribes</h3><p>A través de la propia instancia: DuckDuckGo por defecto, también Google, Qwant o el proveedor configurado.</p></div>
+        <div class="card"><h3>Widget</h3><p>Barra de búsqueda 4×1 redimensionable para la pantalla de inicio, con colores Material You.</p></div>
+        <div class="card"><h3>Material 3</h3><p>Colores dinámicos en Android 12+ y modo oscuro.</p></div>
+        <div class="card"><h3>Abre como prefieras</h3><p>Resultados en una pestaña integrada, en el navegador o dentro de la app. Mantén pulsado un enlace para abrirlo, copiarlo o compartirlo.</p></div>
+        <div class="card"><h3>Integrada en el sistema</h3><p><em>Compartir → SearxBar</em>, <em>Buscar con SearxBar</em> al seleccionar texto y búsquedas web del sistema.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Instalación</h2>
+      <ol class="steps">
+        <li>Instálala con <a href="https://github.com/ImranR98/Obtainium">Obtainium</a> para recibir las actualizaciones directamente desde GitHub, o descarga el APK de la <a href="https://github.com/ilismal/searxbar/releases/latest">última release</a> (tendrás que permitir orígenes desconocidos).</li>
+        <li>Abre la app y pulsa <strong>Introducir URL</strong>, o <strong>Elegir de searx.space</strong> para usar una instancia pública.</li>
+        <li>Opcional: mantén pulsada la pantalla de inicio → <strong>Widgets</strong> → <strong>SearxBar</strong> para añadir la barra de búsqueda.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Compilar</h2>
+      <p>Requisitos: Android Studio (o JDK 17–22 + Android SDK 35).</p>
+      <pre><code>git clone https://github.com/ilismal/searxbar.git
+cd searxbar
+./gradlew assembleDebug</code></pre>
+      <p>Más detalles, incluida la release firmada, en el <a href="https://github.com/ilismal/searxbar#readme">README</a>.</p>
+    </section>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      SearxBar · <a href="https://github.com/ilismal/searxbar">GitHub</a> · <a href="https://github.com/ilismal/searxbar/blob/main/LICENSE">WTFPL</a>
+    </div>
+  </footer>
+</body>
+</html>
