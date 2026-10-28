@@ -2,7 +2,6 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
 }
 
 // Firma de release: se lee de keystore.properties (no versionado). Ver README.
@@ -13,7 +12,7 @@ val keystoreProperties = Properties().apply {
 
 android {
     namespace = "app.searxbar"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "app.searxbar"
@@ -46,9 +45,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
     }
     buildFeatures {
         viewBinding = true
