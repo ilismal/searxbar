@@ -1,0 +1,16 @@
+version: 2
+updates:
+  # Plugins, dependencias y wrapper de Gradle
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      androidx:
+        patterns: ["androidx.*"]
+
+  # Acciones usadas en .github/workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
