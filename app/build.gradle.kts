@@ -60,4 +60,12 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("androidx.browser:browser:1.10.0")
     implementation("com.google.android.material:material:1.14.0")
+
+    // Lint se resuelve aparte del classpath de buildscript: mismas versiones
+    // parcheadas que en el build.gradle.kts raíz.
+    constraints {
+        add("androidLintTool", "org.bouncycastle:bcprov-jdk18on:1.85")
+        add("androidLintTool", "com.google.guava:guava:33.7.2-jre")
+        add("androidLintTool", "org.apache.commons:commons-lang3:3.18.0")
+    }
 }
